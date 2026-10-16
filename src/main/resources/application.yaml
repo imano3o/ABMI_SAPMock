@@ -1,0 +1,22 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: sap-mock
+  datasource:
+    # Postgres DB
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/sapmock}
+    username: ${DB_USERNAME:sapmock}
+    password: ${DB_PASSWORD:sapmock}
+  jpa:
+    hibernate:
+      # Bei jedem Start werden die Tabellen neu angelegt und mit data.sql befüllt,
+      # so startet jede Demo mit denselben Beständen. Nach dem Stoppen bleiben die Daten zum Nachschauen erhalten.
+      ddl-auto: create
+    # data.sql erst ausführen, nachdem Hibernate die Tabellen angelegt hat
+    defer-datasource-initialization: true
+    open-in-view: false
+  sql:
+    init:
+      mode: always
