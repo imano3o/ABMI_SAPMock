@@ -1,0 +1,45 @@
+### Bestände abrufen (Material Stock)
+GET http://localhost:8081/sap/opu/odata/sap/API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod
+
+### Verbrauch buchen: 2 Stück Enoxaparin (Material Document, Bewegungsart 201)
+POST http://localhost:8081/sap/opu/odata/sap/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
+Content-Type: application/json
+
+{
+  "GoodsMovementCode": "03",
+  "MaterialDocumentHeaderText": "Zi. 12, Fr. Müller",
+  "to_MaterialDocumentItem": {
+    "results": [
+      {
+        "Material": "MED-ENOX40",
+        "Plant": "1710",
+        "StorageLocation": "ST03",
+        "GoodsMovementType": "201",
+        "QuantityInEntryUnit": "2",
+        "EntryUnit": "PC",
+        "CostCenter": "17101301"
+      }
+    ]
+  }
+}
+
+### Fehlerfall: mehr verbrauchen als vorhanden → 400 mit SAP-Fehler M7/021
+POST http://localhost:8081/sap/opu/odata/sap/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
+Content-Type: application/json
+
+{
+  "GoodsMovementCode": "03",
+  "to_MaterialDocumentItem": {
+    "results": [
+      {
+        "Material": "MED-ENOX40",
+        "Plant": "1710",
+        "StorageLocation": "ST03",
+        "GoodsMovementType": "201",
+        "QuantityInEntryUnit": "100",
+        "EntryUnit": "PC",
+        "CostCenter": "17101301"
+      }
+    ]
+  }
+}
