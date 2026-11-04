@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Simuliert API_MATERIAL_DOCUMENT_SRV.
- * Beispiel: POST /sap/opu/odata/sap/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
+ * Simulates API_MATERIAL_DOCUMENT_SRV.
+ * Example: POST /sap/opu/odata/sap/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
  */
 @RestController
 @RequestMapping("/sap/opu/odata/sap/API_MATERIAL_DOCUMENT_SRV")

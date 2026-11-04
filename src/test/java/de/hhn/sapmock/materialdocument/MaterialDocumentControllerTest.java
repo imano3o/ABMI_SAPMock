@@ -80,7 +80,7 @@ class MaterialDocumentControllerTest {
 
     @Test
     void schlaegtEinePositionFehlWirdNichtsGebucht() throws Exception {
-        // Erste Position wäre gültig, zweite übersteigt den Bestand: der ganze Beleg muss scheitern
+        // The first item would be valid, the second exceeds the stock: the whole document must fail
         post(document(null, item("MED-IBU400", "201", "10"), item("MED-ONDAN4", "201", "5")))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error.code").value("M7/021"));

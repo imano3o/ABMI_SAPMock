@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.hhn.sapmock.materialstock.MaterialStock;
 
 /**
- * Entität A_MatlStkInAcctMod aus API_MATERIAL_STOCK_SRV.
- * Enthält nur die Felder, die unser Anwendungsfall braucht (entspricht einer SAP-Abfrage mit $select).
- * Feldnamen entsprechen 1:1 der SAP-Signatur; Mengen werden wie in OData v2 als String übertragen.
+ * Entity A_MatlStkInAcctMod from API_MATERIAL_STOCK_SRV.
+ * Contains only the fields our use case needs (like an SAP query with $select).
+ * Field names match the SAP signature 1:1; quantities are sent as strings, as in OData v2.
  */
 public record MatlStkInAcctMod(
         @JsonProperty("Material") String material,

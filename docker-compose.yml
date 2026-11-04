@@ -1,5 +1,5 @@
-# PostgreSQL für den SAP-Mock. Start: docker compose up -d
-# Zugangsdaten passen zu den Standardwerten in src/main/resources/application.yaml.
+# PostgreSQL for the SAP mock. Start: docker compose up -d
+# Credentials match the defaults in src/main/resources/application.yaml.
 services:
   postgres:
     image: postgres:17-alpine
@@ -11,7 +11,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      # Daten bleiben nach dem Stoppen erhalten; der Mock legt die Tabellen beim Start trotzdem neu an
+      # Data survives a stop; the mock still recreates the tables on every start
       - sapmock-data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U sapmock -d sapmock"]

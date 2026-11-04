@@ -5,19 +5,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.hhn.sapmock.materialdocument.MaterialDocumentItem;
 
 /**
- * Position im SAP-Format (A_MaterialDocumentItem). Wird für Request und Response verwendet;
- * die mit "nur Response" markierten Felder setzt der Mock, im Request sind sie null.
+ * Item in SAP format (A_MaterialDocumentItem). Used for request and response;
+ * the fields marked "response only" are set by the mock and are null in the request.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record MaterialDocumentItemDto(
-        @JsonProperty("MaterialDocumentYear") String materialDocumentYear,      // nur Response
-        @JsonProperty("MaterialDocument") String materialDocument,              // nur Response
-        @JsonProperty("MaterialDocumentItem") String materialDocumentItem,      // nur Response
+        @JsonProperty("MaterialDocumentYear") String materialDocumentYear,      // response only
+        @JsonProperty("MaterialDocument") String materialDocument,              // response only
+        @JsonProperty("MaterialDocumentItem") String materialDocumentItem,      // response only
         @JsonProperty("Material") String material,
         @JsonProperty("Plant") String plant,
         @JsonProperty("StorageLocation") String storageLocation,
         @JsonProperty("GoodsMovementType") String goodsMovementType,
-        @JsonProperty("QuantityInEntryUnit") String quantityInEntryUnit,        // String wie bei SAP
+        @JsonProperty("QuantityInEntryUnit") String quantityInEntryUnit,        // String, as in SAP
         @JsonProperty("EntryUnit") String entryUnit,
         @JsonProperty("CostCenter") String costCenter
 ) {

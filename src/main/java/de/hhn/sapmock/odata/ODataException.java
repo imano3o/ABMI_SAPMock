@@ -3,8 +3,8 @@ package de.hhn.sapmock.odata;
 import org.springframework.http.HttpStatus;
 
 /**
- * Fachlicher Fehler, der im SAP-Fehlerformat an den Aufrufer zurückgegeben wird.
- * code entspricht dem SAP-Nachrichtencode, z.B. "M7/021" für fehlenden Bestand.
+ * Business error that is returned to the caller in SAP error format.
+ * code is the SAP message code, e.g. "M7/021" for insufficient stock.
  */
 public class ODataException extends RuntimeException {
 

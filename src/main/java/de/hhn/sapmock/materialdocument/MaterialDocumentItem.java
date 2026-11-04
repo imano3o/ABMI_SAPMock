@@ -10,7 +10,7 @@ import jakarta.persistence.ManyToOne;
 import java.math.BigDecimal;
 
 /**
- * Position eines Materialbelegs (A_MaterialDocumentItem): ein gebuchtes Material mit Menge.
+ * Item of a material document (A_MaterialDocumentItem): one posted material with its quantity.
  */
 @Entity
 public class MaterialDocumentItem {
@@ -22,7 +22,7 @@ public class MaterialDocumentItem {
     @ManyToOne(optional = false)
     private MaterialDocument materialDocument;
 
-    /** Positionsnummer innerhalb des Belegs: "1", "2", … */
+    /** Item number within the document: "1", "2", … */
     @Column(nullable = false, length = 4)
     private String materialDocumentItem;
 
@@ -35,7 +35,7 @@ public class MaterialDocumentItem {
     @Column(nullable = false, length = 4)
     private String storageLocation;
 
-    /** Bewegungsart, aktuell nur "201" = Verbrauch an Kostenstelle */
+    /** Movement type, currently only "201" = consumption for cost center */
     @Column(nullable = false, length = 3)
     private String goodsMovementType;
 
@@ -45,7 +45,7 @@ public class MaterialDocumentItem {
     @Column(nullable = false, length = 3)
     private String entryUnit;
 
-    /** Kostenstelle der verbrauchenden Station */
+    /** Cost center of the consuming ward */
     @Column(length = 10)
     private String costCenter;
 

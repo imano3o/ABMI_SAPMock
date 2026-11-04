@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * Gibt Fehler im OData-v2-Format zurück, so wie SAP es tut:
+ * Returns errors in OData v2 format, just like SAP does:
  * {"error":{"code":"M7/021","message":{"lang":"en","value":"..."}}}
  */
 @RestControllerAdvice

@@ -1,11 +1,11 @@
-# Direkte Aufrufe des Mocks zum Testen während der Entwicklung (in der Demo ruft ABMI den Mock auf).
-# Von oben nach unten ausführen; nach einem Neustart des Mocks stimmen die Zahlen in den Kommentaren.
+# Direct calls to the mock for testing during development (in the demo, ABMI calls the mock).
+# Run from top to bottom; after a restart of the mock, the numbers in the comments are correct.
 @base = http://localhost:8081/sap/opu/odata/sap
 
-### 1. Bestände abrufen (Material Stock): Enoxaparin auf ST03 hat 6 Stück
+### 1. Get stock (Material Stock): Enoxaparin on ST03 has 6 pieces
 GET {{base}}/API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod
 
-### 2. Verbrauch auf Station 3 buchen: 2 Stück Enoxaparin (Material Document, Bewegungsart 201)
+### 2. Post consumption on ward 3: 2 pieces of Enoxaparin (Material Document, movement type 201)
 POST {{base}}/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
 Content-Type: application/json
 
@@ -27,10 +27,10 @@ Content-Type: application/json
   }
 }
 
-### 3. Bestände erneut abrufen: Enoxaparin auf ST03 hat jetzt 4 Stück
+### 3. Get stock again: Enoxaparin on ST03 now has 4 pieces
 GET {{base}}/API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod
 
-### 4. Fehlerfall: mehr verbrauchen als vorhanden → 400 mit SAP-Fehler M7/021, Bestand bleibt bei 4
+### 4. Error case: consume more than available → 400 with SAP error M7/021, stock stays at 4
 POST {{base}}/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
 Content-Type: application/json
 
@@ -51,7 +51,7 @@ Content-Type: application/json
   }
 }
 
-### 5. Andere Station: 1 Stück Morphin auf Station 1 (Chirurgie), eigener Lagerort und eigene Kostenstelle
+### 5. Another ward: 1 piece of Morphine on ward 1 (Surgery), with its own storage location and cost center
 POST {{base}}/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
 Content-Type: application/json
 
@@ -73,7 +73,7 @@ Content-Type: application/json
   }
 }
 
-### 6. Fehlerfall: Material gibt es auf dem Lagerort nicht → 400 mit STOCK_NOT_FOUND
+### 6. Error case: material does not exist at the storage location → 400 with STOCK_NOT_FOUND
 POST {{base}}/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
 Content-Type: application/json
 

@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Simuliert API_MATERIAL_STOCK_SRV (nur lesend, wie das Original).
- * OData-Query-Optionen wie $filter oder $top werden ignoriert, es werden immer alle Bestände geliefert,
- * sortiert nach Lagerort (Station) und Material.
- * Beispiel: GET /sap/opu/odata/sap/API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod
+ * Simulates API_MATERIAL_STOCK_SRV (read-only, like the original).
+ * OData query options such as $filter or $top are ignored; all stock entries are always returned,
+ * sorted by storage location (ward) and material.
+ * Example: GET /sap/opu/odata/sap/API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod
  */
 @RestController
 @RequestMapping("/sap/opu/odata/sap/API_MATERIAL_STOCK_SRV")

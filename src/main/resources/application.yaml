@@ -11,10 +11,10 @@ spring:
     password: ${DB_PASSWORD:sapmock}
   jpa:
     hibernate:
-      # Bei jedem Start werden die Tabellen neu angelegt und mit data.sql befüllt,
-      # so startet jede Demo mit denselben Beständen. Nach dem Stoppen bleiben die Daten zum Nachschauen erhalten.
+      # On every start the tables are recreated and filled from data.sql,
+      # so every demo starts with the same stock. After a stop, the data is kept for inspection.
       ddl-auto: create
-    # data.sql erst ausführen, nachdem Hibernate die Tabellen angelegt hat
+    # run data.sql only after Hibernate has created the tables
     defer-datasource-initialization: true
     open-in-view: false
   sql:

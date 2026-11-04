@@ -17,9 +17,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Bucht Materialbelege und verändert dabei den Lagerbestand – so wie SAP es tut.
- * Unterstützt wird nur Bewegungsart 201 (Verbrauch an Kostenstelle).
- * Fachliche Regeln des KIS (Mindestbestand, Status) liegen bewusst nicht hier, sondern im ABMI-Backend.
+ * Posts material documents and updates the stock, just like SAP does.
+ * Only movement type 201 (consumption for cost center) is supported.
+ * Business rules of the hospital system (minimum stock, status) are deliberately not here but in the ABMI backend.
  */
 @Service
 public class MaterialDocumentService {
@@ -38,8 +38,8 @@ public class MaterialDocumentService {
     }
 
     /**
-     * Legt einen Materialbeleg an. Schlägt eine Position fehl, wird dank @Transactional
-     * nichts gebucht – auch keine der vorherigen Positionen.
+     * Creates a material document. If one item fails, @Transactional ensures that
+     * nothing is posted, not even the previous items.
      */
     @Transactional
     public MaterialDocument create(MaterialDocumentHeaderDto request) {
@@ -103,7 +103,7 @@ public class MaterialDocumentService {
         }
     }
 
-    /** Liest "/Date(1792108800000)/"; ohne Angabe wird das heutige Datum gebucht. */
+    /** Parses "/Date(1792108800000)/"; if no date is given, today's date is posted. */
     private static LocalDate parsePostingDate(String value) {
         if (value == null || value.isBlank()) {
             return LocalDate.now();

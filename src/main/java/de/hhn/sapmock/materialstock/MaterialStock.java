@@ -11,8 +11,8 @@ import jakarta.persistence.UniqueConstraint;
 import java.math.BigDecimal;
 
 /**
- * Frei verwendbarer Lagerbestand eines Materials an einem Lagerort.
- * Wird von Material Stock gelesen und von Material Document verändert.
+ * Unrestricted-use stock of a material at a storage location.
+ * Read by Material Stock and changed by Material Document.
  */
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"material", "plant", "storage_location"}))

@@ -8,20 +8,20 @@ import de.hhn.sapmock.odata.ODataList;
 import java.time.ZoneOffset;
 
 /**
- * Belegkopf im SAP-Format (A_MaterialDocumentHeader) inklusive Positionen unter to_MaterialDocumentItem.
- * Wird für Request und Response verwendet; die mit "nur Response" markierten Felder setzt der Mock.
+ * Document header in SAP format (A_MaterialDocumentHeader), including the items under to_MaterialDocumentItem.
+ * Used for request and response; the fields marked "response only" are set by the mock.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record MaterialDocumentHeaderDto(
-        @JsonProperty("MaterialDocumentYear") String materialDocumentYear,      // nur Response
-        @JsonProperty("MaterialDocument") String materialDocument,              // nur Response
-        @JsonProperty("PostingDate") String postingDate,                        // OData-Format "/Date(...)/"
+        @JsonProperty("MaterialDocumentYear") String materialDocumentYear,      // response only
+        @JsonProperty("MaterialDocument") String materialDocument,              // response only
+        @JsonProperty("PostingDate") String postingDate,                        // OData format "/Date(...)/"
         @JsonProperty("MaterialDocumentHeaderText") String materialDocumentHeaderText,
-        @JsonProperty("GoodsMovementCode") String goodsMovementCode,            // "03" = Warenausgang
+        @JsonProperty("GoodsMovementCode") String goodsMovementCode,            // "03" = goods issue
         @JsonProperty("to_MaterialDocumentItem") ODataList.Results<MaterialDocumentItemDto> toMaterialDocumentItem
 ) {
 
-    /** Warenausgang; das einzige, was der Mock bucht (Bewegungsart 201) */
+    /** Goods issue; the only thing the mock posts (movement type 201) */
     private static final String GOODS_ISSUE = "03";
 
     public static MaterialDocumentHeaderDto from(MaterialDocument document) {

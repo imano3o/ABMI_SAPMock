@@ -41,7 +41,7 @@ class MaterialStockControllerTest {
 
     @Test
     void liefertBestaendeNachLagerortUndMaterialSortiertMitSapFeldnamen() throws Exception {
-        // Sortiert nach Lagerort, dann Material: erster Eintrag ist MED-AMOXI1000 auf ST01; Mengen kommen wie bei SAP als String
+        // Sorted by storage location, then material: the first entry is MED-AMOXI1000 on ST01; quantities come as strings, as in SAP
         mockMvc.perform(get(URL))
                 .andExpect(jsonPath("$.d.results[0].Material").value("MED-AMOXI1000"))
                 .andExpect(jsonPath("$.d.results[0].Plant").value("1710"))

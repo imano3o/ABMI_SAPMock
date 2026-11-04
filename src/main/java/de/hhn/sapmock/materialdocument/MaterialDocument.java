@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Kopf eines Materialbelegs (A_MaterialDocumentHeader).
- * Enthält, was für den ganzen Vorgang gilt; die gebuchten Materialien stehen in den Positionen.
+ * Header of a material document (A_MaterialDocumentHeader).
+ * Holds what applies to the whole transaction; the posted materials are in the items.
  */
 @Entity
 public class MaterialDocument {
@@ -24,7 +24,7 @@ public class MaterialDocument {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Belegnummer, z.B. "4900000001"; zusammen mit dem Jahr der SAP-Schlüssel */
+    /** Document number, e.g. "4900000001"; together with the year it forms the SAP key */
     @Column(nullable = false, length = 10)
     private String materialDocument;
 
@@ -34,7 +34,7 @@ public class MaterialDocument {
     @Column(nullable = false)
     private LocalDate postingDate;
 
-    /** Vermerk zum Vorgang, z.B. Patient/Zimmer; SAP erlaubt max. 25 Zeichen */
+    /** Note on the transaction, e.g. patient/room; SAP allows at most 25 characters */
     @Column(length = 25)
     private String headerText;
 

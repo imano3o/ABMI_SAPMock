@@ -1,7 +1,7 @@
 package de.hhn.sapmock.odata;
 
 /**
- * OData-v2-Antwort für eine einzelne Entität, z.B. nach einem POST: {"d":{...}}
+ * OData v2 response for a single entity, e.g. after a POST: {"d":{...}}
  */
 public record ODataEntity<T>(T d) {
 

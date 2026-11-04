@@ -3,7 +3,7 @@ package de.hhn.sapmock.odata;
 import java.util.List;
 
 /**
- * OData-v2-Antwort für eine Liste von Entitäten: {"d":{"results":[...]}}
+ * OData v2 response for a list of entities: {"d":{"results":[...]}}
  */
 public record ODataList<T>(Results<T> d) {
 

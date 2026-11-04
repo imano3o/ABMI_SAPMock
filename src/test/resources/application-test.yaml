@@ -1,5 +1,5 @@
-# Testprofil: die Tests laufen gegen dieselbe PostgreSQL-Datenbank wie der Mock (docker compose up -d).
-# Vor jedem Test werden die Tabellen geleert und die Startbestände aus data.sql neu eingespielt.
+# Test profile: the tests run against the same PostgreSQL database as the mock (docker compose up -d).
+# Before each test the tables are emptied and the initial stock from data.sql is loaded again.
 spring:
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/sapmock}
