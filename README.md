@@ -42,22 +42,34 @@ Die Verbindung lässt sich über Umgebungsvariablen ändern:
 ## Startbestände
 
 Bei jedem Start werden die Tabellen neu angelegt und aus `src/main/resources/data.sql` befüllt,
-so beginnt jede Demo mit denselben Zahlen. Werk `1710`, Lagerort `ST03` (Station 3), Einheit `PC`.
+so beginnt jede Demo mit denselben Zahlen. Werk `1710`, Einheit `PC`. Der Lagerort ist der Stationscode aus ABMI.
+Der Status in der Tabelle ergibt sich aus den Mindestbeständen in ABMI; der Mock selbst kennt keinen Status.
 
-| Material | Medikament | Bestand |
-|---|---|---|
-| `MED-IBU400` | Ibuprofen 400 mg Tabletten | 240 |
-| `MED-PCM500` | Paracetamol 500 mg Tabletten | 180 |
-| `MED-METAM500` | Metamizol 500 mg Tabletten | 18 (knapp) |
-| `MED-PANTO40` | Pantoprazol 40 mg Tabletten | 120 |
-| `MED-ENOX40` | Enoxaparin 40 mg Fertigspritzen | 6 (kritisch) |
-| `MED-HEP5000` | Heparin 5.000 I.E. Ampullen | 35 |
-| `MED-NACL500` | NaCl 0,9 % 500 ml Infusion | 14 (knapp) |
-| `MED-AMOXI1000` | Amoxicillin 1000 mg Tabletten | 64 |
-| `MED-FUROS40` | Furosemid 40 mg Tabletten | 90 |
-| `MED-ONDAN4` | Ondansetron 4 mg Ampullen | 3 (kritisch) |
-| `MED-MORPH10` | Morphin 10 mg Ampullen | 25 |
-| `MED-INSACT` | Insulin Actrapid 10 ml Durchstechflasche | 12 |
+| Lagerort | Material | Medikament | Bestand |
+|---|---|---|---|
+| `ST01` Chirurgie | `MED-PCM500` | Paracetamol 500 mg Tabletten | 140 |
+| `ST01` Chirurgie | `MED-MORPH10` | Morphin 10 mg Ampullen | 8 (kritisch) |
+| `ST01` Chirurgie | `MED-AMOXI1000` | Amoxicillin 1000 mg Tabletten | 32 (knapp) |
+| `ST01` Chirurgie | `MED-NACL500` | NaCl 0,9 % 500 ml Infusion | 45 |
+| `ST01` Chirurgie | `MED-IBU400` | Ibuprofen 400 mg Tabletten | 160 |
+| `ST01` Chirurgie | `MED-PANTO40` | Pantoprazol 40 mg Tabletten | 60 |
+| `ST02` Kardiologie | `MED-HEP5000` | Heparin 5.000 I.E. Ampullen | 28 (knapp) |
+| `ST02` Kardiologie | `MED-FUROS40` | Furosemid 40 mg Tabletten | 20 (kritisch) |
+| `ST02` Kardiologie | `MED-ENOX40` | Enoxaparin 40 mg Fertigspritzen | 30 |
+| `ST02` Kardiologie | `MED-PANTO40` | Pantoprazol 40 mg Tabletten | 80 |
+| `ST02` Kardiologie | `MED-INSACT` | Insulin Actrapid 10 ml Durchstechflasche | 10 |
+| `ST03` Innere Medizin | `MED-IBU400` | Ibuprofen 400 mg Tabletten | 240 |
+| `ST03` Innere Medizin | `MED-PCM500` | Paracetamol 500 mg Tabletten | 180 |
+| `ST03` Innere Medizin | `MED-METAM500` | Metamizol 500 mg Tabletten | 18 (knapp) |
+| `ST03` Innere Medizin | `MED-PANTO40` | Pantoprazol 40 mg Tabletten | 120 |
+| `ST03` Innere Medizin | `MED-ENOX40` | Enoxaparin 40 mg Fertigspritzen | 6 (knapp) |
+| `ST03` Innere Medizin | `MED-HEP5000` | Heparin 5.000 I.E. Ampullen | 35 |
+| `ST03` Innere Medizin | `MED-NACL500` | NaCl 0,9 % 500 ml Infusion | 14 (knapp) |
+| `ST03` Innere Medizin | `MED-AMOXI1000` | Amoxicillin 1000 mg Tabletten | 64 |
+| `ST03` Innere Medizin | `MED-FUROS40` | Furosemid 40 mg Tabletten | 90 |
+| `ST03` Innere Medizin | `MED-ONDAN4` | Ondansetron 4 mg Ampullen | 3 (kritisch) |
+| `ST03` Innere Medizin | `MED-MORPH10` | Morphin 10 mg Ampullen | 25 |
+| `ST03` Innere Medizin | `MED-INSACT` | Insulin Actrapid 10 ml Durchstechflasche | 12 |
 
 ## Verhalten wie SAP
 
@@ -66,7 +78,7 @@ so beginnt jede Demo mit denselben Zahlen. Werk `1710`, Lagerort `ST03` (Station
 - Belegnummern beginnen bei `4900000001`.
 - `MaterialDocumentHeaderText` wird auf 25 Zeichen gekürzt.
 - Ein Beleg wird ganz oder gar nicht gebucht: Scheitert eine Position, ändert sich kein Bestand.
-- `$filter`, `$select` und `$top` werden ignoriert; es kommen immer alle Bestände.
+- `$filter`, `$select` und `$top` werden ignoriert; es kommen immer alle Bestände aller Lagerorte, sortiert nach Lagerort und Material.
 
 Fehler kommen im SAP-Format mit HTTP-Status `400`:
 

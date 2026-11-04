@@ -36,17 +36,17 @@ class MaterialStockControllerTest {
     void liefertAlleBestaendeImODataFormat() throws Exception {
         mockMvc.perform(get(URL))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.d.results", hasSize(12)));
+                .andExpect(jsonPath("$.d.results", hasSize(23)));
     }
 
     @Test
-    void liefertBestaendeNachMaterialSortiertMitSapFeldnamen() throws Exception {
-        // Erster Eintrag alphabetisch ist MED-AMOXI1000; Mengen kommen wie bei SAP als String
+    void liefertBestaendeNachLagerortUndMaterialSortiertMitSapFeldnamen() throws Exception {
+        // Sortiert nach Lagerort, dann Material: erster Eintrag ist MED-AMOXI1000 auf ST01; Mengen kommen wie bei SAP als String
         mockMvc.perform(get(URL))
                 .andExpect(jsonPath("$.d.results[0].Material").value("MED-AMOXI1000"))
                 .andExpect(jsonPath("$.d.results[0].Plant").value("1710"))
-                .andExpect(jsonPath("$.d.results[0].StorageLocation").value("ST03"))
+                .andExpect(jsonPath("$.d.results[0].StorageLocation").value("ST01"))
                 .andExpect(jsonPath("$.d.results[0].MaterialBaseUnit").value("PC"))
-                .andExpect(jsonPath("$.d.results[0].MatlWrhsStkQtyInMatlBaseUnit").value("64"));
+                .andExpect(jsonPath("$.d.results[0].MatlWrhsStkQtyInMatlBaseUnit").value("32"));
     }
 }
