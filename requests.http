@@ -1,8 +1,12 @@
-### Bestände abrufen (Material Stock)
-GET http://localhost:8081/sap/opu/odata/sap/API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod
+# Direkte Aufrufe des Mocks zum Testen während der Entwicklung (in der Demo ruft ABMI den Mock auf).
+# Von oben nach unten ausführen; nach einem Neustart des Mocks stimmen die Zahlen in den Kommentaren.
+@base = http://localhost:8081/sap/opu/odata/sap
 
-### Verbrauch buchen: 2 Stück Enoxaparin (Material Document, Bewegungsart 201)
-POST http://localhost:8081/sap/opu/odata/sap/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
+### 1. Bestände abrufen (Material Stock): Enoxaparin auf ST03 hat 6 Stück
+GET {{base}}/API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod
+
+### 2. Verbrauch auf Station 3 buchen: 2 Stück Enoxaparin (Material Document, Bewegungsart 201)
+POST {{base}}/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
 Content-Type: application/json
 
 {
@@ -23,8 +27,11 @@ Content-Type: application/json
   }
 }
 
-### Fehlerfall: mehr verbrauchen als vorhanden → 400 mit SAP-Fehler M7/021
-POST http://localhost:8081/sap/opu/odata/sap/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
+### 3. Bestände erneut abrufen: Enoxaparin auf ST03 hat jetzt 4 Stück
+GET {{base}}/API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod
+
+### 4. Fehlerfall: mehr verbrauchen als vorhanden → 400 mit SAP-Fehler M7/021, Bestand bleibt bei 4
+POST {{base}}/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
 Content-Type: application/json
 
 {
@@ -39,6 +46,49 @@ Content-Type: application/json
         "QuantityInEntryUnit": "100",
         "EntryUnit": "PC",
         "CostCenter": "17101301"
+      }
+    ]
+  }
+}
+
+### 5. Andere Station: 1 Stück Morphin auf Station 1 (Chirurgie), eigener Lagerort und eigene Kostenstelle
+POST {{base}}/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
+Content-Type: application/json
+
+{
+  "GoodsMovementCode": "03",
+  "MaterialDocumentHeaderText": "OP-Saal 2",
+  "to_MaterialDocumentItem": {
+    "results": [
+      {
+        "Material": "MED-MORPH10",
+        "Plant": "1710",
+        "StorageLocation": "ST01",
+        "GoodsMovementType": "201",
+        "QuantityInEntryUnit": "1",
+        "EntryUnit": "PC",
+        "CostCenter": "17101101"
+      }
+    ]
+  }
+}
+
+### 6. Fehlerfall: Material gibt es auf dem Lagerort nicht → 400 mit STOCK_NOT_FOUND
+POST {{base}}/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
+Content-Type: application/json
+
+{
+  "GoodsMovementCode": "03",
+  "to_MaterialDocumentItem": {
+    "results": [
+      {
+        "Material": "MED-ONDAN4",
+        "Plant": "1710",
+        "StorageLocation": "ST01",
+        "GoodsMovementType": "201",
+        "QuantityInEntryUnit": "1",
+        "EntryUnit": "PC",
+        "CostCenter": "17101101"
       }
     ]
   }

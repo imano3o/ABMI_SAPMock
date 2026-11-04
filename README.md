@@ -39,6 +39,17 @@ Die Verbindung lässt sich über Umgebungsvariablen ändern:
 | `DB_USERNAME` | `sapmock` |
 | `DB_PASSWORD` | `sapmock` |
 
+## Demo starten
+
+1. Datenbank starten: `docker compose up -d`
+2. Mock starten: `mvnw.cmd spring-boot:run` (Port 8081)
+3. ABMI starten (im Ordner `ABMI`): `mvnw.cmd spring-boot:run` (Port 8080)
+4. Frontend öffnen: <http://localhost:8080> und eine Station auswählen
+
+Mock und ABMI laufen immer zusammen: Das Frontend spricht nur mit ABMI, ABMI ruft den Mock auf.
+`requests.http` ruft den Mock direkt auf und dient nur zum Testen des Mocks während der Entwicklung.
+Für einen neuen Durchlauf den Mock neu starten, dann gelten wieder die Startbestände.
+
 ## Startbestände
 
 Bei jedem Start werden die Tabellen neu angelegt und aus `src/main/resources/data.sql` befüllt,
