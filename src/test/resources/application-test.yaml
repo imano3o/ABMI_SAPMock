@@ -1,6 +1,7 @@
-# Testprofil: H2 im Speicher statt PostgreSQL, im PostgreSQL-Modus damit sich SQL gleich verhält
+# Testprofil: die Tests laufen gegen dieselbe PostgreSQL-Datenbank wie der Mock (docker compose up -d).
+# Vor jedem Test werden die Tabellen geleert und die Startbestände aus data.sql neu eingespielt.
 spring:
   datasource:
-    url: jdbc:h2:mem:sapmock;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
-    username: sa
-    password:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/sapmock}
+    username: ${DB_USERNAME:sapmock}
+    password: ${DB_PASSWORD:sapmock}

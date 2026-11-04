@@ -101,8 +101,9 @@ Fehler kommen im SAP-Format mit HTTP-Status `400`:
 ./mvnw test
 ```
 
-Die Tests laufen gegen eine H2-In-Memory-Datenbank und brauchen weder Docker noch PostgreSQL.
-Vor jedem Test werden die Startbestände neu eingespielt.
+Die Tests laufen gegen dieselbe PostgreSQL-Datenbank wie der Mock, sie muss also laufen (`docker compose up -d`).
+Vor jedem Test werden die Tabellen geleert und die Startbestände neu eingespielt.
+Der Mock selbst darf währenddessen nicht laufen, sonst stimmen Belegnummern und Bestände in den Tests nicht.
 
 ## Projektstruktur
 
