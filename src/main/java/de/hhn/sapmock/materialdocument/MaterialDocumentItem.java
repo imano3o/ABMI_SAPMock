@@ -35,7 +35,7 @@ public class MaterialDocumentItem {
     @Column(nullable = false, length = 4)
     private String storageLocation;
 
-    /** Movement type, currently only "201" = consumption for cost center */
+    /** Movement type: "201" = consumption for cost center, "101" = goods receipt for a purchase order */
     @Column(nullable = false, length = 3)
     private String goodsMovementType;
 
@@ -48,6 +48,13 @@ public class MaterialDocumentItem {
     /** Cost center of the consuming ward */
     @Column(length = 10)
     private String costCenter;
+
+    /** Only set for goods receipts: the order and item that were delivered */
+    @Column(length = 10)
+    private String purchaseOrder;
+
+    @Column(length = 5)
+    private String purchaseOrderItem;
 
     protected MaterialDocumentItem() {
     }
@@ -62,6 +69,14 @@ public class MaterialDocumentItem {
         this.quantity = quantity;
         this.entryUnit = entryUnit;
         this.costCenter = costCenter;
+    }
+
+    public MaterialDocumentItem(String materialDocumentItem, String material, String plant, String storageLocation,
+                                String goodsMovementType, BigDecimal quantity, String entryUnit, String costCenter,
+                                String purchaseOrder, String purchaseOrderItem) {
+        this(materialDocumentItem, material, plant, storageLocation, goodsMovementType, quantity, entryUnit, costCenter);
+        this.purchaseOrder = purchaseOrder;
+        this.purchaseOrderItem = purchaseOrderItem;
     }
 
     void setMaterialDocument(MaterialDocument materialDocument) {
@@ -106,5 +121,13 @@ public class MaterialDocumentItem {
 
     public String getCostCenter() {
         return costCenter;
+    }
+
+    public String getPurchaseOrder() {
+        return purchaseOrder;
+    }
+
+    public String getPurchaseOrderItem() {
+        return purchaseOrderItem;
     }
 }

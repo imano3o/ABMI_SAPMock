@@ -17,12 +17,9 @@ public record MaterialDocumentHeaderDto(
         @JsonProperty("MaterialDocument") String materialDocument,              // response only
         @JsonProperty("PostingDate") String postingDate,                        // OData format "/Date(...)/"
         @JsonProperty("MaterialDocumentHeaderText") String materialDocumentHeaderText,
-        @JsonProperty("GoodsMovementCode") String goodsMovementCode,            // "03" = goods issue
+        @JsonProperty("GoodsMovementCode") String goodsMovementCode,            // "03" = goods issue, "01" = goods receipt
         @JsonProperty("to_MaterialDocumentItem") ODataList.Results<MaterialDocumentItemDto> toMaterialDocumentItem
 ) {
-
-    /** Goods issue; the only thing the mock posts (movement type 201) */
-    private static final String GOODS_ISSUE = "03";
 
     public static MaterialDocumentHeaderDto from(MaterialDocument document) {
         long millis = document.getPostingDate().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli();
@@ -31,7 +28,7 @@ public record MaterialDocumentHeaderDto(
                 document.getMaterialDocument(),
                 "/Date(" + millis + ")/",
                 document.getHeaderText(),
-                GOODS_ISSUE,
+                document.getGoodsMovementCode(),
                 new ODataList.Results<>(document.getItems().stream().map(MaterialDocumentItemDto::from).toList())
         );
     }

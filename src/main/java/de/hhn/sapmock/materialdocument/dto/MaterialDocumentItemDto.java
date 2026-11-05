@@ -19,7 +19,9 @@ public record MaterialDocumentItemDto(
         @JsonProperty("GoodsMovementType") String goodsMovementType,
         @JsonProperty("QuantityInEntryUnit") String quantityInEntryUnit,        // String, as in SAP
         @JsonProperty("EntryUnit") String entryUnit,
-        @JsonProperty("CostCenter") String costCenter
+        @JsonProperty("CostCenter") String costCenter,
+        @JsonProperty("PurchaseOrder") String purchaseOrder,                    // goods receipt only
+        @JsonProperty("PurchaseOrderItem") String purchaseOrderItem             // goods receipt only
 ) {
 
     public static MaterialDocumentItemDto from(MaterialDocumentItem item) {
@@ -33,7 +35,9 @@ public record MaterialDocumentItemDto(
                 item.getGoodsMovementType(),
                 item.getQuantity().stripTrailingZeros().toPlainString(),
                 item.getEntryUnit(),
-                item.getCostCenter()
+                item.getCostCenter(),
+                item.getPurchaseOrder(),
+                item.getPurchaseOrderItem()
         );
     }
 }
