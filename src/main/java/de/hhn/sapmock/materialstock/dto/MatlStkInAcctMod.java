@@ -5,7 +5,6 @@ import de.hhn.sapmock.materialstock.MaterialStock;
 
 /**
  * Entity A_MatlStkInAcctMod from API_MATERIAL_STOCK_SRV.
- * Contains only the fields our use case needs (like an SAP query with $select).
  * Field names match the SAP signature 1:1; quantities are sent as strings, as in OData v2.
  */
 public record MatlStkInAcctMod(

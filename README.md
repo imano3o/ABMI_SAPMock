@@ -6,11 +6,11 @@ Der Mock läuft auf Port **8081** und bildet drei SAP-APIs nach: Bestände (Mate
 Fachliche Regeln wie Mindestbestand, Status oder die Bestellmenge liegen im ABMI-Backend; der Mock prüft nur,
 was auch SAP prüfen würde.
 
-| API | Endpunkt | Stand |
-|---|---|---|
-| Material Stock | `GET /sap/opu/odata/sap/API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod` | fertig |
-| Material Document | `POST /sap/opu/odata/sap/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader` | fertig (Bewegungsart 201 und 101) |
-| Purchase Order | `GET` und `POST /sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV/A_PurchaseOrder` | fertig |
+| API | Endpunkt |
+|---|---|
+| Material Stock | `GET /sap/opu/odata/sap/API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod` |
+| Material Document | `POST /sap/opu/odata/sap/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader` (Bewegungsart 201 und 101) |
+| Purchase Order | `GET` und `POST /sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV/A_PurchaseOrder` |
 
 ## APIs im Detail
 
@@ -96,10 +96,9 @@ Die Verbindung lässt sich über Umgebungsvariablen ändern:
 4. Frontend öffnen: <http://localhost:8080> und eine Station auswählen
 
 Mock und ABMI laufen immer zusammen: Das Frontend spricht nur mit ABMI, ABMI ruft den Mock auf.
-`requests.http` ruft den Mock direkt auf und dient nur zum Testen des Mocks während der Entwicklung.
 Für einen neuen Durchlauf den Mock neu starten, dann gelten wieder die Startbestände und es gibt keine Bestellungen.
 
-`requests.http` spielt den ganzen Ablauf direkt gegen den Mock durch: Bestand lesen, Verbrauch buchen (201),
+`requests.http` ruft den Mock direkt auf, ohne ABMI, und spielt den ganzen Ablauf durch: Bestand lesen, Verbrauch buchen (201),
 Bestellung anlegen, Bestellungen lesen, Wareneingang buchen (101) und den doppelten Wareneingang als Fehlerfall (M7/022).
 
 ## Startbestände
