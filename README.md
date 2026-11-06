@@ -1,13 +1,62 @@
 # ABMI_SAPMock
 
 Lokale Simulation der SAP-S/4HANA-OData-APIs, die das ABMI-Backend (MediFlow) braucht.
-Der Mock läuft auf Port **8081** und bildet zwei SAP-APIs nach: Bestände (Material Stock) und Materialbelege (Material Document), jeweils mit SAP-Fehlermeldungen.
-Fachliche Regeln wie Mindestbestand oder Status liegen im ABMI-Backend.
+Der Mock läuft auf Port **8081** und bildet drei SAP-APIs nach: Bestände (Material Stock), Materialbelege
+(Material Document: Verbrauch und Wareneingang) und Bestellungen (Purchase Order), jeweils mit SAP-Fehlermeldungen.
+Fachliche Regeln wie Mindestbestand, Status oder die Bestellmenge liegen im ABMI-Backend; der Mock prüft nur,
+was auch SAP prüfen würde.
 
 | API | Endpunkt | Stand |
 |---|---|---|
 | Material Stock | `GET /sap/opu/odata/sap/API_MATERIAL_STOCK_SRV/A_MatlStkInAcctMod` | fertig |
-| Material Document | `POST /sap/opu/odata/sap/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader` | fertig (nur Bewegungsart 201) |
+| Material Document | `POST /sap/opu/odata/sap/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader` | fertig (Bewegungsart 201 und 101) |
+| Purchase Order | `GET` und `POST /sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV/A_PurchaseOrder` | fertig |
+
+## APIs im Detail
+
+### Material Stock
+
+`GET …/A_MatlStkInAcctMod` liefert alle Bestände aller Lagerorte. Pro Eintrag: `Material`, `Plant`,
+`StorageLocation`, `MaterialBaseUnit`, `MatlWrhsStkQtyInMatlBaseUnit` (Menge als String).
+
+### Material Document
+
+`POST …/A_MaterialDocumentHeader` bucht einen Beleg mit Positionen unter `to_MaterialDocumentItem.results`.
+
+| Bewegungsart | `GoodsMovementCode` | Wirkung | Felder der Position |
+|---|---|---|---|
+| `201` Verbrauch an Kostenstelle | `03` | Bestand sinkt, nie unter 0 | `Material`, `Plant`, `StorageLocation`, `QuantityInEntryUnit`, `CostCenter` |
+| `101` Wareneingang zur Bestellung | `01` | Bestand steigt, Bestellposition wird beliefert | zusätzlich `PurchaseOrder`, `PurchaseOrderItem` (Standard `10`) |
+
+Beim Wareneingang prüft der Mock wie SAP: Die Bestellposition muss existieren, Material und Lagerort müssen
+passen und es darf nicht mehr geliefert werden als noch offen ist. Teillieferungen sind möglich;
+die Position ist vollständig geliefert, sobald die ganze Menge da ist.
+
+### Purchase Order
+
+`POST …/A_PurchaseOrder` legt eine Bestellung an:
+
+```json
+{
+  "CompanyCode": "1710",
+  "PurchaseOrderType": "NB",
+  "Supplier": "17300001",
+  "PurchasingOrganization": "1710",
+  "PurchasingGroup": "001",
+  "to_PurchaseOrderItem": { "results": [
+    { "Material": "MED-ENOX40", "Plant": "1710", "StorageLocation": "ST03",
+      "OrderQuantity": "30", "PurchaseOrderQuantityUnit": "PC" }
+  ] }
+}
+```
+
+Antwort `201` mit `{"d":{…}}`: Der Mock vergibt `PurchaseOrder` (ab `4500000001`), die Positionsnummern
+(`10`, `20`, …) und `PurchaseOrderDate`. Fehlen `CompanyCode`, `PurchaseOrderType` oder `PurchasingOrganization`,
+nimmt er `1710` / `NB` / `1710`. Das Material muss im Werk und Lagerort einen Bestand haben (die Bestandstabelle dient
+als Materialstamm).
+
+`GET …/A_PurchaseOrder` liefert alle Bestellungen mit ihren Positionen. Jede Position hat zusätzlich
+`IsCompletelyDelivered`, damit ABMI offene von gelieferten Bestellungen unterscheiden kann.
 
 ## Voraussetzungen
 
@@ -48,7 +97,10 @@ Die Verbindung lässt sich über Umgebungsvariablen ändern:
 
 Mock und ABMI laufen immer zusammen: Das Frontend spricht nur mit ABMI, ABMI ruft den Mock auf.
 `requests.http` ruft den Mock direkt auf und dient nur zum Testen des Mocks während der Entwicklung.
-Für einen neuen Durchlauf den Mock neu starten, dann gelten wieder die Startbestände.
+Für einen neuen Durchlauf den Mock neu starten, dann gelten wieder die Startbestände und es gibt keine Bestellungen.
+
+`requests.http` spielt den ganzen Ablauf direkt gegen den Mock durch: Bestand lesen, Verbrauch buchen (201),
+Bestellung anlegen, Bestellungen lesen, Wareneingang buchen (101) und den doppelten Wareneingang als Fehlerfall (M7/022).
 
 ## Startbestände
 
@@ -86,10 +138,12 @@ Der Status in der Tabelle ergibt sich aus den Mindestbeständen in ABMI; der Moc
 
 - Antworten im OData-v2-Format: Listen als `{"d":{"results":[…]}}`, einzelne Objekte als `{"d":{…}}`.
 - Mengen werden als String übertragen, Datumswerte als `/Date(<Millisekunden>)/`.
-- Belegnummern beginnen bei `4900000001`.
+- Belegnummern beginnen bei `4900000001`, Bestellnummern bei `4500000001`.
 - `MaterialDocumentHeaderText` wird auf 25 Zeichen gekürzt.
 - Ein Beleg wird ganz oder gar nicht gebucht: Scheitert eine Position, ändert sich kein Bestand.
-- `$filter`, `$select` und `$top` werden ignoriert; es kommen immer alle Bestände aller Lagerorte, sortiert nach Lagerort und Material.
+- `$filter`, `$select`, `$top` und `$expand` werden ignoriert: Es kommen immer alle Bestände aller Lagerorte
+  (sortiert nach Lagerort und Material) bzw. alle Bestellungen mit ihren Positionen (sortiert nach Nummer).
+  Gefiltert wird in ABMI.
 
 Fehler kommen im SAP-Format mit HTTP-Status `400`:
 
@@ -101,10 +155,16 @@ Fehler kommen im SAP-Format mit HTTP-Status `400`:
 |---|---|
 | `M7/021` | weniger Bestand vorhanden als gebucht werden soll |
 | `STOCK_NOT_FOUND` | Material gibt es in Werk/Lagerort nicht |
-| `UNSUPPORTED_MOVEMENT_TYPE` | Bewegungsart ist nicht `201` |
+| `UNSUPPORTED_MOVEMENT_TYPE` | Bewegungsart ist nicht `201` oder `101` |
 | `INVALID_QUANTITY` | Menge fehlt, ist keine Zahl oder ≤ 0 |
 | `INVALID_DATE` | `PostingDate` nicht im Format `/Date(…)/` |
-| `NO_ITEMS` | Beleg ohne Positionen |
+| `NO_ITEMS` | Beleg oder Bestellung ohne Positionen |
+| `M7/146` | Wareneingang ohne Bestellnummer |
+| `M7/013` | Bestellposition gibt es nicht |
+| `PO_MISMATCH` | Material oder Lagerort passt nicht zur Bestellposition |
+| `M7/022` | Bestellposition schon vollständig geliefert oder Menge größer als die offene Menge |
+| `ME/083` | Bestellung ohne Lieferant |
+| `ME/062` | Material in Werk/Lagerort nicht gepflegt |
 
 ## Tests
 
@@ -121,7 +181,8 @@ Der Mock selbst darf währenddessen nicht laufen, sonst stimmen Belegnummern und
 ```
 src/main/java/de/hhn/sapmock/
   materialstock/      API_MATERIAL_STOCK_SRV
-  materialdocument/   API_MATERIAL_DOCUMENT_SRV
+  materialdocument/   API_MATERIAL_DOCUMENT_SRV (Verbrauch 201, Wareneingang 101)
+  purchaseorder/      API_PURCHASEORDER_PROCESS_SRV
   odata/              OData-Antwort- und Fehlerformat
 src/main/resources/
   specs/              Original-API-Spezifikationen aus dem SAP Business Accelerator Hub
