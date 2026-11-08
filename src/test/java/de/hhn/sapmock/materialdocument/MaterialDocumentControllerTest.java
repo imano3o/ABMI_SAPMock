@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class MaterialDocumentControllerTest {
 
     private static final String URL = "/sap/opu/odata/sap/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader";
+    private static final String ORDER_URL = "/sap/opu/odata/sap/API_PURCHASEORDER_PROCESS_SRV/A_PurchaseOrder";
 
     @Autowired
     private WebApplicationContext context;
@@ -91,7 +92,7 @@ class MaterialDocumentControllerTest {
 
     @Test
     void andereBewegungsartWirdAbgelehnt() throws Exception {
-        post(document(null, item("MED-IBU400", "101", "1")))
+        post(document(null, item("MED-IBU400", "311", "1")))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error.code").value("UNSUPPORTED_MOVEMENT_TYPE"));
     }
@@ -128,6 +129,70 @@ class MaterialDocumentControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.d.PostingDate").value("/Date(1792108800000)/"))
                 .andExpect(jsonPath("$.d.MaterialDocumentYear").value("2026"));
+    }
+
+    @Test
+    void wareneingangErhoehtBestandUndSchliesstBestellung() throws Exception {
+        String order = createOrder("MED-ENOX40", "50");
+
+        mockMvc.perform(MockMvcRequestBuilders.post(URL).contentType(MediaType.APPLICATION_JSON)
+                        .content(goodsReceipt(order, "MED-ENOX40", "50")))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.d.GoodsMovementCode").value("01"))
+                .andExpect(jsonPath("$.d.to_MaterialDocumentItem.results[0].GoodsMovementType").value("101"))
+                .andExpect(jsonPath("$.d.to_MaterialDocumentItem.results[0].PurchaseOrder").value(order));
+
+        assertThat(stock("MED-ENOX40")).isEqualByComparingTo("56");
+        mockMvc.perform(MockMvcRequestBuilders.get(ORDER_URL))
+                .andExpect(jsonPath("$.d.results[0].to_PurchaseOrderItem.results[0].IsCompletelyDelivered").value(true));
+    }
+
+    @Test
+    void teillieferungIstErlaubtAberNichtMehrAlsBestellt() throws Exception {
+        String order = createOrder("MED-ENOX40", "50");
+
+        post(goodsReceipt(order, "MED-ENOX40", "30")).andExpect(status().isCreated());
+        post(goodsReceipt(order, "MED-ENOX40", "30"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("M7/022"));
+
+        assertThat(stock("MED-ENOX40")).isEqualByComparingTo("36");
+    }
+
+    @Test
+    void wareneingangOhneBestellungWirdAbgelehnt() throws Exception {
+        post(document(null, item("MED-ENOX40", "101", "5")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("M7/146"));
+    }
+
+    @Test
+    void wareneingangFuerAnderesMaterialWirdAbgelehnt() throws Exception {
+        String order = createOrder("MED-ENOX40", "50");
+
+        post(goodsReceipt(order, "MED-IBU400", "5"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error.code").value("PO_MISMATCH"));
+    }
+
+    private String createOrder(String material, String quantity) throws Exception {
+        String body = """
+                {"Supplier": "17300001", "to_PurchaseOrderItem": {"results": [
+                  {"Material": "%s", "Plant": "1710", "StorageLocation": "ST03", "OrderQuantity": "%s"}]}}
+                """.formatted(material, quantity);
+        String response = mockMvc.perform(MockMvcRequestBuilders.post(ORDER_URL)
+                        .contentType(MediaType.APPLICATION_JSON).content(body))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        return com.jayway.jsonpath.JsonPath.read(response, "$.d.PurchaseOrder");
+    }
+
+    private static String goodsReceipt(String purchaseOrder, String material, String quantity) {
+        return """
+                {"GoodsMovementCode": "01", "to_MaterialDocumentItem": {"results": [
+                  {"Material": "%s", "Plant": "1710", "StorageLocation": "ST03", "GoodsMovementType": "101",
+                   "QuantityInEntryUnit": "%s", "PurchaseOrder": "%s", "PurchaseOrderItem": "10"}]}}
+                """.formatted(material, quantity, purchaseOrder);
     }
 
     private ResultActions post(String body) throws Exception {

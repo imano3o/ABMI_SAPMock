@@ -93,3 +93,73 @@ Content-Type: application/json
     ]
   }
 }
+
+### 7. Create a purchase order: 50 pieces of Enoxaparin for ward 3 (Purchase Order); the answer contains the number, e.g. 4500000001
+POST {{base}}/API_PURCHASEORDER_PROCESS_SRV/A_PurchaseOrder
+Content-Type: application/json
+
+{
+  "CompanyCode": "1710",
+  "PurchaseOrderType": "NB",
+  "Supplier": "17300001",
+  "PurchasingOrganization": "1710",
+  "PurchasingGroup": "001",
+  "to_PurchaseOrderItem": {
+    "results": [
+      {
+        "Material": "MED-ENOX40",
+        "Plant": "1710",
+        "StorageLocation": "ST03",
+        "OrderQuantity": "50",
+        "PurchaseOrderQuantityUnit": "PC"
+      }
+    ]
+  }
+}
+
+### 8. Get all purchase orders: IsCompletelyDelivered is still false
+GET {{base}}/API_PURCHASEORDER_PROCESS_SRV/A_PurchaseOrder
+
+### 9. Goods receipt for the order (Material Document, movement type 101): stock of Enoxaparin on ST03 goes up by 50
+POST {{base}}/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
+Content-Type: application/json
+
+{
+  "GoodsMovementCode": "01",
+  "MaterialDocumentHeaderText": "Lieferung",
+  "to_MaterialDocumentItem": {
+    "results": [
+      {
+        "Material": "MED-ENOX40",
+        "Plant": "1710",
+        "StorageLocation": "ST03",
+        "GoodsMovementType": "101",
+        "QuantityInEntryUnit": "50",
+        "EntryUnit": "PC",
+        "PurchaseOrder": "4500000001",
+        "PurchaseOrderItem": "10"
+      }
+    ]
+  }
+}
+
+### 10. Error case: the same goods receipt again → 400 with M7/022, the order is already completely delivered
+POST {{base}}/API_MATERIAL_DOCUMENT_SRV/A_MaterialDocumentHeader
+Content-Type: application/json
+
+{
+  "GoodsMovementCode": "01",
+  "to_MaterialDocumentItem": {
+    "results": [
+      {
+        "Material": "MED-ENOX40",
+        "Plant": "1710",
+        "StorageLocation": "ST03",
+        "GoodsMovementType": "101",
+        "QuantityInEntryUnit": "50",
+        "PurchaseOrder": "4500000001",
+        "PurchaseOrderItem": "10"
+      }
+    ]
+  }
+}

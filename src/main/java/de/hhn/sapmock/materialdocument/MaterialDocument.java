@@ -34,6 +34,10 @@ public class MaterialDocument {
     @Column(nullable = false)
     private LocalDate postingDate;
 
+    /** "03" = goods issue (consumption), "01" = goods receipt for a purchase order */
+    @Column(nullable = false, length = 2)
+    private String goodsMovementCode;
+
     /** Note on the transaction, e.g. patient/room; SAP allows at most 25 characters */
     @Column(length = 25)
     private String headerText;
@@ -45,10 +49,12 @@ public class MaterialDocument {
     protected MaterialDocument() {
     }
 
-    public MaterialDocument(String materialDocument, String materialDocumentYear, LocalDate postingDate, String headerText) {
+    public MaterialDocument(String materialDocument, String materialDocumentYear, LocalDate postingDate,
+                            String goodsMovementCode, String headerText) {
         this.materialDocument = materialDocument;
         this.materialDocumentYear = materialDocumentYear;
         this.postingDate = postingDate;
+        this.goodsMovementCode = goodsMovementCode;
         this.headerText = headerText;
     }
 
@@ -71,6 +77,10 @@ public class MaterialDocument {
 
     public LocalDate getPostingDate() {
         return postingDate;
+    }
+
+    public String getGoodsMovementCode() {
+        return goodsMovementCode;
     }
 
     public String getHeaderText() {
